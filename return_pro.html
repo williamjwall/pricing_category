@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReturnPro Service Selection</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
+</head>
+<body>
+    <h1>ReturnPro Service Selection</h1>
+    
+    <form>
+        <label for="category">Select Category or Subcategory:</label>
+        <select id="category" name="category" onchange="updatePrice()">
+            <option value="">--Please choose an option--</option>
+        </select>
+        
+        <br><br>
+        
+        <label for="weight">Select Weight:</label>
+        <select id="weight" name="weight" onchange="updatePrice()">
+            <option value="">--Please choose an option--</option>
+        </select>
+        
+        <br><br>
+        
+        <p>Price: <span id="price"></span></p>
+    </form>
+
+    <script>
+        async function fetchExcel() {
+            const response = await fetch('Return Pro ChatGPT V3.xlsx');
+            const arrayBuffer = await response.arrayBuffer();
+            const data = new Uint8Array(arrayBuffer);
+            const workbook = XLSX.read(data, { type: 'array' });
+
+            // Assuming the first sheet is the one we need
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+            const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+            processExcelData(jsonData);
+        }
+
+        function processExcelData(data) {
+            const headers = data[0];
+            const prices = {};
+
+            for (let i = 1; i < data.length; i++) {
+                const row = data[i];
+                const category = row[0];
+                if (category) {
+                    prices[category] = {};
+                    for (let j = 2; j < headers.length; j++) {
+                        const weight = headers[j];
+                        const price = row[j];
+                        if (price !== undefined && price !== null) {
+                            prices[category][weight] = price;
+                        }
+                    }
+                }
+            }
+
+            updateFormOptions(prices);
+        }
+
+        function updateFormOptions(prices) {
+            const categorySelect = document.getElementById('category');
+            categorySelect.innerHTML = '<option value="">--Please choose an option--</option>';
+            for (const category in prices) {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                categorySelect.appendChild(option);
+            }
+
+            const weightSelect = document.getElementById('weight');
+            weightSelect.innerHTML = '<option value="">--Please choose an option--</option>';
+            if (Object.keys(prices).length > 0) {
+                const firstCategory = Object.keys(prices)[0];
+                for (const weight in prices[firstCategory]) {
+                    const option = document.createElement('option');
+                    option.value = weight;
+                    option.textContent = weight;
+                    weightSelect.appendChild(option);
+                }
+            }
+        }
+
+        function updatePrice() {
+            const categorySelect = document.getElementById('category');
+            const weightSelect = document.getElementById('weight');
+            const priceDisplay = document.getElementById('price');
+            const selectedCategory = categorySelect.value;
+            const selectedWeight = weightSelect.value;
+
+            if (selectedCategory && selectedWeight) {
+                const price = prices[selectedCategory][selectedWeight];
+                if (price !== undefined) {
+                    priceDisplay.textContent = `$${price.toFixed(2)}`;
+                } else {
+                    priceDisplay.textContent = 'Price not available';
+                }
+            } else {
+                priceDisplay.textContent = '';
+            }
+        }
+
+        // Initialize empty prices object
+        let prices = {};
+
+        // Fetch and parse Excel data on window load
+        window.onload = function() {
+            fetchExcel();
+        }
+    </script>
+</body>
+</html>
