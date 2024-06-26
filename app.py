@@ -2,9 +2,9 @@ import streamlit as st
 import pandas as pd
 import os
 
-# Function to read the Excel file and process the data
-def read_excel(file_path):
-    df = pd.read_excel(file_path, sheet_name='Total')
+# Function to read the CSV file and process the data
+def read_csv(file_path):
+    df = pd.read_csv(file_path)
     headers = df.columns
     prices = {}
 
@@ -19,12 +19,12 @@ def read_excel(file_path):
                     prices[category][weight] = price
     return prices
 
-# File path to the Excel file
-file_path = 'Return Pro ChatGPT V3.xlsx'
+# File path to the CSV file
+file_path = 'Total.csv'
 
 # Ensure the file exists in the directory
 if os.path.exists(file_path):
-    prices = read_excel(file_path)
+    prices = read_csv(file_path)
 
     st.header("ReturnPro Service Selection")
 
