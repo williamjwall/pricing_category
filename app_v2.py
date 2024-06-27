@@ -30,7 +30,7 @@ def read_csv(file_path):
 files = {
     'Supply Chain': 'Supply Chain.csv',
     'VAS': 'VAS.csv',
-    'Total': 'Total (1).csv'
+    'Total': 'Cleaned_Price_Data.csv'
 }
 
 # Set Streamlit theme
