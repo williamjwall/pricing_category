@@ -67,10 +67,6 @@ if sheet_name:
 
             if weight:
                 # Display Price with styling
-                price = prices[category][weight]
-                st.markdown(f"<h2 style='color: #4CAF50;'>Price: ${price:.2f}</h2>", unsafe_allow_html=True)
-
-                # Display Activities if available
                 if category in activities:
                     activity = activities[category]
                     # Split the activities into a list
@@ -80,6 +76,10 @@ if sheet_name:
                     for act in activity_list:
                         st.markdown(f"<li style='color: #2196F3;'>{act}</li>", unsafe_allow_html=True)
                     st.markdown("</ul>", unsafe_allow_html=True)
+                
+                price = prices[category][weight]
+                st.markdown(f"<h2 style='color: #4CAF50;'>Price: ${price:.2f}</h2>", unsafe_allow_html=True)
+
 
     else:
         st.error("No data available to display. Please check the file content.")
